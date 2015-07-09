@@ -15,6 +15,8 @@
 #define PORT 8080
 #define BACKLOG 10
 
+#define BUFSIZE8 256
+#define BUFSIZE10 1024
 
 int inet_aton(const char *cp, struct in_addr *inp);
 
@@ -108,11 +110,10 @@ int main (const int argc, const char *argv[])
 
   unsigned int sin_size;
 
-  unsigned int bufsize8 = 256;
-  char* buffer_m = malloc(bufsize8*sizeof(*buffer_m));
-
-  unsigned int bufsize10 = 1024;
-  char* buffer = malloc(bufsize10*sizeof(*buffer));
+  unsigned int bufsize8 = BUFSIZE8;
+  unsigned int bufsize10 = BUFSIZE10;
+  char buffer_m[BUFSIZE8];
+  char buffer[BUFSIZE10];
 
   CHKNULL(buffer, "bad allocation");
   CHKNULL(buffer_m, "bad allocation");
@@ -169,7 +170,5 @@ int main (const int argc, const char *argv[])
   localerr = close(sockfd);
   CHKERR(localerr, "closing passive socket");
 
-  free(buffer);
-  free(buffer_m);
   exit(EXIT_SUCCESS);
 }

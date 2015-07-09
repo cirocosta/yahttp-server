@@ -15,6 +15,7 @@
 
 #define PORT 8080
 #define BACKLOG 10
+#define BUFSIZE 1024
 
 // TODO understand this better.
 void sigchld_handler(int s)
@@ -28,6 +29,8 @@ int main(void)
   struct sockaddr_in server_addr;
   struct sockaddr_in client_addr;
   struct sigaction sa;
+
+  char buffer[BUFSIZE];
 
   unsigned int sin_size;
   int yes=1;
@@ -47,6 +50,12 @@ int main(void)
   server_addr.sin_port = htons(PORT);
   server_addr.sin_addr.s_addr = INADDR_ANY;
   memset(&(server_addr.sin_zero), '\0', 8);
+
+  printf("Will serve at: %s:%d\n",
+         inet_ntoa(server_addr.sin_addr),
+         ntohs(server_addr.sin_port));
+  gethostname(buffer, BUFSIZE);
+  printf("Hosting from: %s\n", buffer);
 
   CHKERR(
     bind(s_sock_fd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)),
@@ -88,6 +97,7 @@ int main(void)
       exit(EXIT_SUCCESS);
     } else if (pid > 0) { // parent
       close(c_sock_fd);
+      printf("Gone: %s\n", inet_ntoa(client_addr.sin_addr));
     } else {  // error
       perror("fork()");
     }
