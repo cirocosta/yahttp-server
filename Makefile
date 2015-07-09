@@ -1,11 +1,13 @@
-CFLAGS = -Wall -Werror 
+CFLAGS = -Wall -Werror -g
 SRC_DIR = ./src
 
-main: $(SRC_DIR)/main.c
-	$(CC) $(CFLAGS) -o $@ $^ 
-ifneq (,$(findstring r, $(MAKEFLAGS)))
-	./$@
-endif
+all: tcp-client.out tcp-server.out
+
+tcp-client.out: $(SRC_DIR)/tcp-client.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+tcp-server.out: $(SRC_DIR)/tcp-server.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $@ $^
@@ -13,6 +15,6 @@ endif
 .PHONY: clean
 
 clean:
-	find . -name 'main' -delete & \
+	find . -name '*.out' -delete & \
 	find . -name '*.a' -delete & \
 	find . -name '*.o' -delete

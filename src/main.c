@@ -8,36 +8,21 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include "CHK.h"
+
 // NOTICE: all ports under 1024 are RESERVED
 // we can go with any up to 65535 (if not used)
 #define PORT 8080
 #define BACKLOG 10
 
-#define CHKERR(var, msg) \
-  do { \
-    if (!~var) { \
-      fputs(msg, stderr); \
-      fputs(strerror(errno), stderr); \
-      exit(EXIT_FAILURE); \
-    } \
-  } while (0)
-
-#define CHKNULL(var, msg) \
-  do { \
-    if (var == NULL) { \
-      fputs(msg, stderr); \
-      fputs(strerror(errno), stderr); \
-      exit(EXIT_FAILURE); \
-    } \
-  } while (0)
 
 int inet_aton(const char *cp, struct in_addr *inp);
 
 
 /**
-   * inet_aton: converts the Internet host address cp 
-   *            from the IPv4 num‐ bers-and-dots notation into binary 
-   *            form (in network byte order) and stores it in the 
+   * inet_aton: converts the Internet host address cp
+   *            from the IPv4 num‐ bers-and-dots notation into binary
+   *            form (in network byte order) and stores it in the
    *            structure that inp points to.
    *
    *
@@ -52,19 +37,19 @@ int inet_aton(const char *cp, struct in_addr *inp);
    *         error encountered during a call to a sys or lib fun.
    *
    *         perror(const char *s);
-   *         
+   *
    *
    * bind: having the socket we must associate the socket with a port
    *       on the local machine. The port number is used by the kernel
-   *       to match an incoming packet to a certein process' 
-   *       descriptor. 
+   *       to match an incoming packet to a certein process'
+   *       descriptor.
    *
    *       bind(int sockfd, struct sockaddr *my_addr, int addrlen);
    *
    *       note that addrlen can  be directly set to
    *       sizeof(struct sockaddr)
    *
-   * connect: initiates a connection on a socket. Doesn't require a 
+   * connect: initiates a connection on a socket. Doesn't require a
    *          bind before connecting.
    *
    *          int connect(int sockfd, struct sockaddr *serv_addr,
@@ -83,7 +68,7 @@ int inet_aton(const char *cp, struct in_addr *inp);
    *
    *
    * accept: someone is trying to `connect()` to the machine on a port
-   *         that we've passed to it and we're listening on. The 
+   *         that we've passed to it and we're listening on. The
    *         connection will be queue until we accept it. When we
    *         accept it then we'll tell it to get the pending connection
    *         and it will return us a brand new socket file descriptor
@@ -93,7 +78,7 @@ int inet_aton(const char *cp, struct in_addr *inp);
    *         int accept(int sockfd, void *addr, int *addrlen)
    *
    *
-   * send: sends a message on a socket. May be used only when the 
+   * send: sends a message on a socket. May be used only when the
    *       socket is in a connected state. Notice that the message
    *       might be too long to pass atomically through the underlying
    *       protocol (resulting in EMSGSIZE error.
@@ -103,17 +88,17 @@ int inet_aton(const char *cp, struct in_addr *inp);
    *       returns the number of characters sent (or -1 on error)
    *
    *
-   * recv: used to receive messages from a socket, whether or not it 
+   * recv: used to receive messages from a socket, whether or not it
    *       is connection-oriented.
    *
    *       int recv(int sockfd, void *buf, size_t len, int flags);
-   *       
+   *
    *       returns the number of bytes received (-1 on error or 0 when
    *       the remote side has closed the connection).
    *
    */
 
-int main ()
+int main (const int argc, const char *argv[])
 {
   struct sockaddr_in my_addr;
   struct sockaddr_in their_addr;
@@ -138,7 +123,7 @@ int main ()
   my_addr.sin_family = AF_INET;
   my_addr.sin_port = htons(PORT);  // chooses at random
   inet_aton("10.12.110.57", &(my_addr.sin_addr));
-  my_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
+  my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   memset(&(my_addr.sin_zero), '\0', 8);
 
   localerr = bind(sockfd, (struct sockaddr*)&my_addr, sizeof(struct sockaddr));
@@ -147,7 +132,7 @@ int main ()
   /* localerr = connect(sockfd, (struct sockaddr*)&my_addr, sizeof(struct sockaddr)); */
   CHKERR(localerr, "connect");
 
-  printf("Serving at: %s:%d\n", 
+  printf("Serving at: %s:%d\n",
          inet_ntoa(my_addr.sin_addr),
          ntohs(my_addr.sin_port));
   gethostname(buffer_m, bufsize8);
@@ -166,7 +151,7 @@ int main ()
     recv(new_fd, buffer, bufsize10, 0);
     printf("%s\n", buffer);
     // send() might not send everything. It's up to us to do
-    // the right thing and send the rest (we know that by 
+    // the right thing and send the rest (we know that by
     // checking the return value of send)
     send(new_fd, "hello world\n", 12, 0);
     send(new_fd, "HTTP/1.1 200 OK\n", 16, 0);
