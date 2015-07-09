@@ -46,7 +46,7 @@ flags = [
   '-fexceptions',
   '-DNDEBUG',
 
-  '-std=c99',
+  '-std-c99',
   '-x',
   'c',
 

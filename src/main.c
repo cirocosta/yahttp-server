@@ -22,6 +22,15 @@
     } \
   } while (0)
 
+#define CHKNULL(var, msg) \
+  do { \
+    if (var == NULL) { \
+      fputs(msg, stderr); \
+      fputs(strerror(errno), stderr); \
+      exit(EXIT_FAILURE); \
+    } \
+  } while (0)
+
 int inet_aton(const char *cp, struct in_addr *inp);
 
 
@@ -108,12 +117,20 @@ int main ()
 {
   struct sockaddr_in my_addr;
   struct sockaddr_in their_addr;
+  struct sockaddr_in peer_addr;
   int sockfd, new_fd;
   int localerr;
+
   unsigned int sin_size;
 
-  int bufsize = 1024;
-  char* buffer = malloc(bufsize*sizeof(*buffer));
+  unsigned int bufsize8 = 256;
+  char* buffer_m = malloc(bufsize8*sizeof(*buffer_m));
+
+  unsigned int bufsize10 = 1024;
+  char* buffer = malloc(bufsize10*sizeof(*buffer));
+
+  CHKNULL(buffer, "bad allocation");
+  CHKNULL(buffer_m, "bad allocation");
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   CHKERR(sockfd, "socket");
@@ -133,6 +150,8 @@ int main ()
   printf("Serving at: %s:%d\n", 
          inet_ntoa(my_addr.sin_addr),
          ntohs(my_addr.sin_port));
+  gethostname(buffer_m, bufsize8);
+  printf("Hosting from: %s\n", buffer_m);
 
   while (1) {
     localerr = listen(sockfd, BACKLOG);
@@ -142,18 +161,30 @@ int main ()
     new_fd = accept(sockfd, (struct sockaddr*)&their_addr, &sin_size);
     CHKERR(new_fd, "accept");
 
-    recv(new_fd, buffer, bufsize, 0);
+    // we might receive 0 in recv (indicating the the other party
+    // closed the connection)
+    recv(new_fd, buffer, bufsize10, 0);
     printf("%s\n", buffer);
+    // send() might not send everything. It's up to us to do
+    // the right thing and send the rest (we know that by 
+    // checking the return value of send)
     send(new_fd, "hello world\n", 12, 0);
     send(new_fd, "HTTP/1.1 200 OK\n", 16, 0);
     send(new_fd, "Content-length: 46\n", 19, 0);
     send(new_fd, "Content-Type: text/html\n\n", 25, 0);
     send(new_fd, "<html><body><H1>Hello world</H1></body></html>",46, 0);
-    close(new_fd);
+    getpeername(new_fd, (struct sockaddr*)&peer_addr, &sin_size);
+
+    printf("Connected: %s\n", inet_ntoa(peer_addr.sin_addr));
+
+    localerr = close(new_fd);
+    CHKERR(localerr, "closing their socket");
   }
 
-  close(sockfd);
+  localerr = close(sockfd);
+  CHKERR(localerr, "closing passive socket");
 
-  printf("terminating.\n");
+  free(buffer);
+  free(buffer_m);
   exit(EXIT_SUCCESS);
 }
