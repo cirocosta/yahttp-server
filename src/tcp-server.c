@@ -17,7 +17,18 @@
 #define BACKLOG 10
 #define BUFSIZE 1024
 
-// TODO understand this better.
+/**
+ * After a process' death there are some remnant waiting around for the
+ * parent process to pickup. By 'wait()'ing we can vanish all the ramnant.
+ *
+ * We could just ignore (`signal(SIGCHLD, SIG_IGN)`) making the child process
+ * to be market as <defunct> in the `ps` listing and then let the OS take care
+ * of it when the parent dies. But, as we prefer explicit of implicit, here i'm
+ * waiting.
+ *
+ * `wait()` will wait for whichever child happens to exit first. If we'd like
+ * to wait for a particular child, `waitpid()`.
+ */
 void sigchld_handler(int s)
 {
   while(wait(NULL) > 0);
@@ -67,12 +78,23 @@ int main(void)
     "listen"
   );
 
-  // TODO undeerstand this better.
+  // the signal handler function (or SIG_IGN to igonore)
   sa.sa_handler = &sigchld_handler;
+  // set of signals to block while this one is being handled.
+  // In our case, an empty set will be blocked (none)
   sigemptyset(&sa.sa_mask);
+  // flags to modify the behavior of the handler (or 0).
   sa.sa_flags = SA_RESTART;
 
   CHKERR(
+    // int sigaction(int sig, const struct sigaction *act,
+    //                struct sigaction *oact)
+    // sig: which signal to catch. A symbolic name from 'signal.h'
+    // act: points to a struct sigaction which has fields to control the
+    //      behavior of the signal handler (a pointer to a func in the struct).
+    // oact: pointer to the old signal handler info that was in place before.
+    //       Useful if we wish to restore the previous signal handler at a
+    //       later time.
     sigaction(SIGCHLD, &sa, NULL),
     "sigaction"
   );
