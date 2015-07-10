@@ -24,7 +24,8 @@
 //                execution.
 void sigint_handler(int sig)
 {
-  // note that we're not using `printf()` here.
+  // note that we're not using `printf()` here. 'printf()' is not async-safe,
+  // while `write` is.
   write(0, "Ahhh! SIGINT!\n", 14);
 }
 
@@ -34,7 +35,7 @@ int main(void)
   struct sigaction sa;
 
   sa.sa_handler = &sigint_handler;
-  sa.sa_flags = 0;
+  sa.sa_flags = SA_RESTART;
   sigemptyset(&sa.sa_mask);
 
   // each signal has a current disposition which determines how the process
