@@ -125,5 +125,11 @@ int main(void)
     }
   }
 
+  // note that 'close' just closes OUR INTERFACE to
+  // the socket and not the socket it self. When to close
+  // the socket is up to the kernel. It is normal for the
+  // socket to go into a TIME_WAIT state, for example.
+  close(s_sock_fd);
+
   return EXIT_SUCCESS;
 }

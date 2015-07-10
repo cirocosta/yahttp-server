@@ -1,4 +1,10 @@
+# generated
 *.o
 *.out
 *.a
 *.pyc
+
+# documentation
+docs/*.html
+*.pdf
+
