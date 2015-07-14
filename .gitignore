@@ -1,8 +1,12 @@
 # generated
-*.o
-*.out
-*.a
+build/
 *.pyc
+
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
 
 # documentation
 docs/*.html
