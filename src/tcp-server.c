@@ -108,10 +108,14 @@ int main(void)
       continue;
     }
 
-    printf("Connected: %s\n", inet_ntoa(client_addr.sin_addr));
+    printf("Connected to: %s\n", inet_ntoa(client_addr.sin_addr));
 
     if (!(pid = fork())) { // child
       close(s_sock_fd);
+
+      recv(c_sock_fd, buffer, BUFSIZE, 0);
+      printf("%s\n", buffer);
+
       if (!~send(c_sock_fd, "Hello, world!\n", 14, 0))
         perror("send");
 

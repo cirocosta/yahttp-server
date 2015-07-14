@@ -115,9 +115,6 @@ int main (const int argc, const char *argv[])
   char buffer_m[BUFSIZE8];
   char buffer[BUFSIZE10];
 
-  CHKNULL(buffer, "bad allocation");
-  CHKNULL(buffer_m, "bad allocation");
-
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   CHKERR(sockfd, "socket");
 

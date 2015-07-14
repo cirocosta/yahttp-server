@@ -46,11 +46,12 @@ int main(int argc, char *argv[])
     "socket"
   );
 
-  printf("Socket Created!\n'");
+  printf("Socket Created!\n");
 
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(PORT);
   server_addr.sin_addr = *((struct in_addr *)he->h_addr_list[0]);
+  printf("\tsaddr: %d", server_addr.sin_addr.s_addr);
   memset(&(server_addr.sin_zero), '\0', 8);
 
   CHKERR(
