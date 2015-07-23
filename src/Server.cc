@@ -1,11 +1,12 @@
-#include "Server.hh"
+#include "yahttp/Server.hh"
 
 void sigchld_handler (int s)
 {
   while (wait(NULL) > 0);
 }
 
-namespace http {
+namespace yahttp {
+
   Server::Server(unsigned port)
     : m_port(port)
   {
@@ -63,8 +64,8 @@ namespace http {
     int err = 0;
     int pid;
     unsigned sin_size;
-    struct addrinfo* address_info;
     char buffer[BUFSIZE];
+
 
     err = listen(m_server_socket, BACKLOG);
     if (!~err) {
@@ -103,7 +104,6 @@ namespace http {
       } else {                // error
         std::cerr << "fork(): " << strerror(errno) << std::endl;
       }
-
     }
 
     return err;

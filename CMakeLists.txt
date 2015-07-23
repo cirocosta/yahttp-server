@@ -1,7 +1,13 @@
+#     --    config
+
 cmake_minimum_required(VERSION 2.8)
+
+# Turn it ON: -Dtest=ON
+option(test "Include Tests." OFF)
 
 set(PROJECT_NAME yahttp-server)
 project(${PROJECT_NAME} C CXX)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -15,7 +21,23 @@ else()
     message(STATUS "Please use a different C++ compiler.")
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR})
 
+#     --    dependencies
+
+add_subdirectory(lib)
+
+
+#     --    source
+
+include_directories(${PROJECT_SOURCE_DIR}/includes)
 add_subdirectory(src/)
-include_directories(${PROJECT_SOURCE_DIR}/src)
+
+
+#     --    testing
+
+if (test)
+  enable_testing()
+  add_subdirectory(tests/)
+endif(test)
+
+

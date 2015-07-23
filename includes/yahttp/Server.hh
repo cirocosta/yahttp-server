@@ -1,5 +1,5 @@
-#ifndef HTTP_SERVER_HH
-#define HTTP_SERVER_HH
+#ifndef YAHTTP__SERVER_HH
+#define YAHTTP__SERVER_HH
 
 #include <unistd.h>
 #include <string.h>
@@ -16,7 +16,7 @@
 #include <iostream>
 #include <string>
 
-namespace http {
+namespace yahttp {
   #define BACKLOG 10
   #define BUFSIZE 1024
 
@@ -30,14 +30,16 @@ namespace http {
     int m_client_socket;
 
   public:
-    Server(const unsigned port);
-    ~Server();
+    Server (const unsigned port);
+    ~Server ();
 
-    int start();
-    void end();
+    int start ();
+    void end ();
+    void show_info ();
   private:
-    int _init();
+    int _init ();
   };
-};
+
+}; // ! ns yahttp
 
 #endif

@@ -1,9 +1,9 @@
 #include <iostream>
-#include "Server.hh"
+#include "yahttp/Server.hh"
 
 int main(int argc, char *argv[])
 {
-  http::Server server(8080);
+  yahttp::Server server(8080);
 
   server.start();
 
