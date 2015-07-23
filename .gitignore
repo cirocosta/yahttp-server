@@ -12,3 +12,6 @@ install_manifest.txt
 docs/*.html
 *.pdf
 
+# editor
+.ycm_extra_conf.py
+
