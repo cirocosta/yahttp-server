@@ -21,14 +21,15 @@ install:
   - cd bison-3.0.4
   - ./configure
   - make
-  - export BISON_EXEC=$(pwd)/src/bison
+  - export BISON_EXEC_PATH=$(pwd)/src
   - export BISON_PKGDATADIR=$(pwd)/data
+  - export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${BISON_EXEC_PATH}
   - cd ..
 
 before_script:
   - mkdir build
   - cd build
-  - cmake -Dtest=ON -DBISON_EXECUTABLE=${BISON_EXEC} ..
+  - cmake -Dtest=ON ..
 
 script:
   - make && valgrind --leak-check=yes --error-exitcode=1 ./tests/dummy_test
